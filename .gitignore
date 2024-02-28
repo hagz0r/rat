@@ -1,0 +1,6 @@
+/target
+/.idea
+/client/target
+/client/.idea
+/host/target
+/host/.idea
