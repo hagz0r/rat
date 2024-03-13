@@ -3,8 +3,8 @@ use std::io::BufRead;
 use reqwest::Client;
 use serde_json::json;
 
-const ADDRESS_SEND: &str = "http://127.0.0.1:8080/send";
-const ADDRESS_RECV: &str = "http://127.0.0.1:8080/recvhost";
+const ADDRESS_SEND: &str = "http://185.128.107.176:8080/send";
+const ADDRESS_RECV: &str = "http://185.128.107.176:8080/recvhost";
 
 #[tokio::main]
 async fn main() {
@@ -33,9 +33,9 @@ async fn send_msg(msg: String, client: &Client) -> Result<(), reqwest::Error> {
 
 async fn recv_msg(client: &Client) -> Result<(), reqwest::Error> {
 	let res = client.get(ADDRESS_RECV).send().await?;
-	if res.status() == 200 {
-		let data = res.text().await?;
-		println!("Received: {}", data);
-	}
+	// if res.status() == 200 {
+	let data = res.text().await?;
+	println!("Received: {}", data);
+	// }
 	Ok(())
 }
