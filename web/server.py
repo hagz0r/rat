@@ -1,9 +1,22 @@
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-
+banlist = []
 data_send = []
 data_sendhost = []
+
+
+@app.route('/banlist', methods=['POST', 'GET', 'UPDATE'])
+def banlist():
+    global banlist
+    if request.method == 'POST':
+        banlist = request.get_json()
+        return jsonify({f'message': 'Banlist setted! {banlist}'}), 200
+    elif request.method == 'GET':
+        return jsonify(banlist)
+    elif request.method == 'DELETE':
+        banlist.remove(request.get_json())
+        return jsonify({f'message': '{banlist}'})
 
 
 @app.route('/send', methods=['POST'])
